@@ -61,6 +61,10 @@ def register():
             jsonify({"error": "invalid email format"}),
             400,
         )
+
+    if User.query.filter_by(email=email).first() is not None:
+        return jsonify({"error": "User with this email already exists"}), 400
+
     if password_has_issue(password):
         return (
             jsonify({"error": password_has_issue(password)}),
@@ -69,7 +73,10 @@ def register():
 
     user = User(id=generate_uuid_integer(), username=username, email=email)
     user.set_password(password)
-    db.session.add(user)
-    db.session.commit()
-
-    return jsonify({"message": "Successfully created user"}), 200
+    try:
+        db.session.add(user)
+        db.session.commit()
+        return jsonify({"message": "Successfully created user"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred while registering the user"}), 500
