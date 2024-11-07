@@ -8,6 +8,7 @@ migrate = Migrate()
 def create_app(config_filename=None):
     from .models import db
     from .main import blueprint as main_blueprint
+    from .auth import blueprint as auth_blueprint
 
     app = Flask(__name__)
     config_filename = config_filename or config.DevConfig
@@ -16,5 +17,10 @@ def create_app(config_filename=None):
     migrate.init_app(app, db)
 
     app.register_blueprint(main_blueprint, url_prefix="/main")
+    app.register_blueprint(auth_blueprint, url_prefix="/auth")
+
+    for rule in app.url_map.iter_rules():
+        methods = ", ".join(rule.methods)
+        print(f"{rule.endpoint:30s} {methods:20s} {rule}")
 
     return app
