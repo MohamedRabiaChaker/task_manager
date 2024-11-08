@@ -29,6 +29,8 @@ List out and briefly describe each feature. For example:
 | Endpoint         | Method | Description             |
 | ---------------- | ------ | ----------------------- |
 | `/main/test`      | GET     | Testing initial project structure    |
+| `/auth/register`      | POST     | register new user    |
+| `/auth/login`      | POST     | log user in using JWT    |
 
 ### Development setup
 
