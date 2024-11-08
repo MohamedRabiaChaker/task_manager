@@ -29,6 +29,11 @@ List out and briefly describe each feature. For example:
 | Endpoint         | Method | Description             |
 | ---------------- | ------ | ----------------------- |
 | `/main/test`      | GET     | Testing initial project structure    |
+| `/auth/register`      | POST     | register new user    |
+| `/auth/login`      | POST     | log user in using JWT    |
 
+### Development setup
 
+during early development we are using a postgres docker container and running it with the following credentials: 
 
+` docker run --name postgres-container -e POSTGRES_USER=myuser -e POSTGRES_PASSWORBD=mypassword -e POSTGRES_DB=mydb -p 5432:5432 -d postgres ` 
