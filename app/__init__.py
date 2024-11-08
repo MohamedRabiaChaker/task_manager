@@ -1,6 +1,10 @@
-from flask import Flask
+import os
+
 from . import config
+
+from flask import Flask
 from flask_migrate import Migrate
+
 
 migrate = Migrate()
 
@@ -18,6 +22,7 @@ def create_app(config_filename=None):
 
     app.register_blueprint(main_blueprint, url_prefix="/main")
     app.register_blueprint(auth_blueprint, url_prefix="/auth")
+    app.config["SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 
     for rule in app.url_map.iter_rules():
         methods = ", ".join(rule.methods)

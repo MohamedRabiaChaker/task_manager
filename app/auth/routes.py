@@ -1,10 +1,12 @@
 import uuid
+import os
 
 from . import blueprint
 from ..models import User
 from ..models import db
 
 from flask import request, jsonify
+import jwt
 
 
 def validate_email(email):
@@ -80,3 +82,23 @@ def register():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "An error occurred while registering the user"}), 500
+
+
+@blueprint.route("/login", methods=["POST"])
+def login():
+    data = request.get_json()
+    if "password" not in data or "email" not in data:
+        return jsonify({"error": "Missing email or password"}), 400
+    email = data["email"]
+    password = data["password"]
+    try:
+        user: User = User.query.filter_by(email=email).first()
+    except Exception as e:
+        return jsonify({"error": "internal server error", "stack": str(e)}), 500
+
+    if not user.check_password(password) or not user:
+        return jsonify({"error": "passowrd and email combination is incorrect"}), 400
+
+    SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+    token = jwt.encode({"email": email, "id": user.id}, key=SECRET_KEY)
+    return jsonify({"token": token, "message": "login successful"}), 200
