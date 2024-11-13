@@ -6,6 +6,7 @@ from ..models.task import Task
 from ..models import db
 
 from flask import request, jsonify
+from sqlalchemy import or_
 
 
 @blueprint.route("/<id>", methods=["GET", "PUT"])
@@ -28,7 +29,7 @@ def get_task_by_id(id):
             return f"An issue occured when updating task: {e}", 500
 
 
-@blueprint.route("", methods=["POST"])
+@blueprint.route("", methods=["POST", "GET"])
 @auth_protected
 def modify_task():
     id, _ = extract_token_data()
@@ -54,7 +55,6 @@ def modify_task():
             db.session.add(task)
             db.session.commit()
             return jsonify({"message": "Task successfully created"}), 200
-
         except Exception as e:
             db.session.rollback()
             return (
@@ -66,3 +66,14 @@ def modify_task():
                 ),
                 500,
             )
+
+    if request.method == "GET":
+        tasks = Task.query.filter(
+            or_(
+                Task.created_by == id,
+                Task.assigned_to == id,
+                Task.reviewed_by == id,
+            )
+        ).all()
+        tasks = [task.to_dict() for task in tasks]
+        return jsonify(tasks)
