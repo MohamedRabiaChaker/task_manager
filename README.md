@@ -31,6 +31,11 @@ List out and briefly describe each feature. For example:
 | `/main/test`      | GET     | Testing initial project structure    |
 | `/auth/register`      | POST     | register new user    |
 | `/auth/login`      | POST     | log user in using JWT    |
+| `/task/<id>`      | GET     | get task by id    |
+| `/task/<id>`      | PUT     | update task definition    |
+| `/task/<id>`      | DELETE     | delete existing task     |
+| `/task/`      | POST     | create new task    |
+| `/task/`      | GET     | get tasked relevant for current user (creatd, assigned or reviewed)     |
 
 ### Development setup
 
