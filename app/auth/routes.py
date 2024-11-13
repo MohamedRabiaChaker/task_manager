@@ -1,49 +1,12 @@
-import uuid
 import os
 
 from . import blueprint
+from .helpers import password_has_issue, validate_email, generate_uuid_integer
 from ..models import User
 from ..models import db
 
 from flask import request, jsonify
 import jwt
-
-
-def validate_email(email):
-    import re
-
-    pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
-    return re.match(pattern, email) is not None
-
-
-def password_has_issue(password):
-    import re
-
-    if len(password) < 8:
-        return "Password must be at least 8 characters long."
-
-    if not re.search(r"[A-Z]", password):
-        return "Password must contain at least one uppercase letter."
-
-    if not re.search(r"[a-z]", password):
-        return "Password must contain at least one lowercase letter."
-
-    if not re.search(r"\d", password):
-        return "Password must contain at least one digit."
-
-    if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-        return "Password must contain at least one special character."
-
-    return False
-
-
-def generate_uuid_integer():
-    uuid_as_int = uuid.uuid4().int
-
-    sql_integer_range = (2**31) - 1
-    limited_uuid_int = uuid_as_int % sql_integer_range
-
-    return limited_uuid_int
 
 
 @blueprint.route("/register", methods=["POST"])

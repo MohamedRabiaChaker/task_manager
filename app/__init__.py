@@ -13,6 +13,7 @@ def create_app(config_filename=None):
     from .models import db
     from .main import blueprint as main_blueprint
     from .auth import blueprint as auth_blueprint
+    from .task import blueprint as task_blueprint
 
     app = Flask(__name__)
     config_filename = config_filename or config.DevConfig
@@ -22,6 +23,7 @@ def create_app(config_filename=None):
 
     app.register_blueprint(main_blueprint, url_prefix="/main")
     app.register_blueprint(auth_blueprint, url_prefix="/auth")
+    app.register_blueprint(task_blueprint, url_prefix="/task")
     app.config["SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 
     for rule in app.url_map.iter_rules():
