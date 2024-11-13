@@ -25,3 +25,13 @@ class Task(db.Model):
 
     def to_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+    def update(self, updates):
+        try:
+            for key, value in updates.items():
+                if hasattr(self, key):
+                    setattr(self, key, value)
+            self.updated_at = datetime.utcnow()
+            db.session.commit()
+        except:
+            db.session.rollback()

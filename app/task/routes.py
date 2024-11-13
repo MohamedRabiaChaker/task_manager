@@ -8,16 +8,27 @@ from ..models import db
 from flask import request, jsonify
 
 
-@blueprint.route("/<id>", methods=["GET"])
+@blueprint.route("/<id>", methods=["GET", "PUT"])
 @auth_protected
 def get_task_by_id(id):
-    task = Task.query.filter_by(id=id).first()
-    if not task:
-        return jsonify({"message": "task not found"}), 404
-    return jsonify(task.to_dict()), 200
+    if request.method == "GET":
+        task = Task.query.filter_by(id=id).first()
+        if not task:
+            return jsonify({"message": "task not found"}), 404
+        return jsonify(task.to_dict()), 200
+    if request.method == "PUT":
+        task = Task.query.filter_by(id=id).first()
+        if not task:
+            return "Task not found", 404
+        try:
+            task.update(request.get_json())
+
+            return jsonify(task.to_dict()), 200
+        except Exception as e:
+            return f"An issue occured when updating task: {e}", 500
 
 
-@blueprint.route("", methods=["POST", "PUT"])
+@blueprint.route("", methods=["POST"])
 @auth_protected
 def modify_task():
     id, _ = extract_token_data()
