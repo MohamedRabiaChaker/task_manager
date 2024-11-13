@@ -9,7 +9,7 @@ from flask import request, jsonify
 from sqlalchemy import or_
 
 
-@blueprint.route("/<id>", methods=["GET", "PUT"])
+@blueprint.route("/<id>", methods=["GET", "PUT", "DELETE"])
 @auth_protected
 def get_task_by_id(id):
     if request.method == "GET":
@@ -20,13 +20,30 @@ def get_task_by_id(id):
     if request.method == "PUT":
         task = Task.query.filter_by(id=id).first()
         if not task:
-            return "Task not found", 404
+            return jsonify({"message": "Task not found"}), 404
         try:
             task.update(request.get_json())
 
             return jsonify(task.to_dict()), 200
         except Exception as e:
-            return f"An issue occured when updating task: {e}", 500
+            return (
+                jsonify({"message": f"An issue occured when updating task: {e}"}),
+                500,
+            )
+    if request.method == "DELETE":
+        try:
+            db.session.query(Task).filter(Task.id == id).delete()
+            db.session.commit()
+            return (
+                jsonify({"message": "Task deleted successfully"}),
+                200,
+            )
+        except Exception as e:
+            db.session.rollback()
+            return (
+                jsonify({"message": f"An issue occured when deleting task: {e}"}),
+                500,
+            )
 
 
 @blueprint.route("", methods=["POST", "GET"])
@@ -76,4 +93,4 @@ def modify_task():
             )
         ).all()
         tasks = [task.to_dict() for task in tasks]
-        return jsonify(tasks)
+        return jsonify(tasks), 200
